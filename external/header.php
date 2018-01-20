@@ -53,7 +53,7 @@ if ($controlIPs === false || in_array($_SERVER['REMOTE_ADDR'], $controlIPs) || P
 }
 
 
-//Certain URLs should never have a link displayed. Think images, xml, etc. 
+//Certain URLs should never have a link displayed. Think images, xml, etc.
 foreach($exceptionURLs as $url)
 {
     if (stripos($_SERVER['REQUEST_URI'], $url) !== FALSE)
@@ -61,7 +61,7 @@ foreach($exceptionURLs as $url)
         $_xhprof['display'] = false;
         header('X-XHProf-No-Display: Trueness');
         break;
-    }    
+    }
 }
 unset($exceptionURLs);
 
@@ -73,7 +73,7 @@ foreach ($exceptionPostURLs as $url)
     {
         $_xhprof['savepost'] = false;
         break;
-    }    
+    }
 }
 unset($exceptionPostURLs);
 
@@ -85,7 +85,7 @@ if ($_xhprof['doprofile'] === false)
     {
         $_xhprof['doprofile'] = true;
         $_xhprof['type'] = 0;
-    } 
+    }
 }
 unset($weight);
 
@@ -102,15 +102,31 @@ unset($ignoreURLs);
 unset($url);
 
 //Display warning if extension not available
-if (extension_loaded('xhprof') && $_xhprof['doprofile'] === true) {
+$extension_is_loaded = (
+    !empty($_xhprof['extension']) &&
+    in_array($_xhprof['extension'], array('xhprof', 'tideways_xhprof')) &&
+    extension_loaded($_xhprof['extension'])
+);
+if ($extension_is_loaded && $_xhprof['doprofile'] === true) {
     include_once dirname(__FILE__) . '/../xhprof_lib/utils/xhprof_lib.php';
     include_once dirname(__FILE__) . '/../xhprof_lib/utils/xhprof_runs.php';
     if (isset($ignoredFunctions) && is_array($ignoredFunctions) && !empty($ignoredFunctions)) {
-        xhprof_enable(XHPROF_FLAGS_CPU + XHPROF_FLAGS_MEMORY, array('ignored_functions' => $ignoredFunctions));
+        if ($_xhprof['extension'] === 'xhprof') {
+            xhprof_enable(XHPROF_FLAGS_CPU + XHPROF_FLAGS_MEMORY, array('ignored_functions' => $ignoredFunctions));
+        } else {
+            // @TODO can Tideways ignore functions?
+            tideways_xhprof_enable(TIDEWAYS_XHPROF_FLAGS_MEMORY | TIDEWAYS_XHPROF_FLAGS_CPU);
+        }
+
     } else {
-        xhprof_enable(XHPROF_FLAGS_CPU + XHPROF_FLAGS_MEMORY);
+        if ($_xhprof['extension'] === 'xhprof') {
+            xhprof_enable(XHPROF_FLAGS_CPU + XHPROF_FLAGS_MEMORY);
+        } else {
+            tideways_xhprof_enable(TIDEWAYS_XHPROF_FLAGS_MEMORY | TIDEWAYS_XHPROF_FLAGS_CPU);
+        }
+
     }
-}elseif(!extension_loaded('xhprof') && $_xhprof['display'] === true)
+}elseif(!$extension_is_loaded && $_xhprof['display'] === true)
 {
     $message = 'Warning! Unable to profile run, xhprof extension not loaded';
     trigger_error($message, E_USER_WARNING);
