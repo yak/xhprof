@@ -1,4 +1,5 @@
-##XHPROF UI FORK WITH POSTGRESQL AND TIDEWAYS PHP PROFILER (PHP7) SUPPORT
+XHPROF UI FORK WITH POSTGRESQL AND TIDEWAYS PHP PROFILER (PHP7) SUPPORT
+=======================================================================
 
 PostgreSQL support for Paul Reinheimer's fork of the official, and now unmaintained, Facebook XHProf UI was submitted as
 a pull request in Feb 2013 (<https://github.com/preinheimer/xhprof/pull/63>). That request is as of Jan 2018 still open.
@@ -11,7 +12,8 @@ Note that Reinheimer's fork was also patched to support Tideways but still does 
 In short: this is an old codebase without namespaces and rife with globals, but if you wish to use PostgreSQL and PHP7,
 it is a working solution.
 
-###ORIGINAL README FROM PREINHEIMER
+ORIGINAL README FROM PREINHEIMER
+--------------------------------
 
 This branch/clone/whatever git calls it of the official Facebook GUI does a few things:
 
